@@ -1,10 +1,16 @@
 const q = require('inquirer');
+require('console.table');
 const figlet = require('figlet');
 const texthelper = require('./lib/texthelper');
 const EmployeeDB = require('./lib/EmployeeDB');
 
 const db = new EmployeeDB();
 
+init();
+
+/*------------------------------
+Initialization
+------------------------------*/
 
 async function init () {
   db.connect();
@@ -44,7 +50,13 @@ async function prompt_main_menu () {
   ]);
   switch(texthelper.decode(data.role)) {
     case 'View All Employees':
-
+      display_employees();
+      break;
+    case 'View All Roles':
+      display_roles();
+      break;
+    case 'View All Departments':
+      display_depts();
       break;
     default:
       await prompt_exit();
@@ -67,4 +79,24 @@ async function prompt_exit() {
   }
 }
 
-init();
+/*------------------------------
+"View All" functions
+------------------------------*/
+
+async function display_employees () {
+  const employees = await db.getEmployees();
+  console.table('\n',employees);
+  await prompt_main_menu();
+}
+
+async function display_roles () {
+  const roles = await db.getRoles();
+  console.table('\n',roles);
+  await prompt_main_menu();
+}
+
+async function display_depts () {
+  const depts = await db.getDepts();
+  console.table('\n',depts);
+  await prompt_main_menu();
+}
