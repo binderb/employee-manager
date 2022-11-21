@@ -38,6 +38,7 @@ async function prompt_main_menu () {
       type: 'list',
       message: 'What would you like to do?',
       choices: [texthelper.red('View All Employees'),
+                texthelper.red('View Employees by Manager'),
                 texthelper.red('Add Employee'),
                 texthelper.red('Update Employee Role/Manager'),
                 texthelper.green('View All Roles'),
@@ -51,6 +52,9 @@ async function prompt_main_menu () {
   switch(texthelper.decode(data.role)) {
     case 'View All Employees':
       display_employees();
+      break;
+    case 'View Employees by Manager':
+      display_by_manager();
       break;
     case 'Add Employee':
       await add_employee();
@@ -110,6 +114,32 @@ async function display_roles () {
 async function display_depts () {
   const depts = await db.getDepts();
   console.table('\n',depts);
+  await prompt_main_menu();
+}
+
+async function display_by_manager () {
+  console.log('displaying by manager');
+  const employee_data = await db.getEmployees();
+  const manager_names = [];
+
+  for (employee of employee_data) {
+    if (employee.manager !== '-' && !manager_names.includes(employee.manager)) manager_names.push(employee.manager);
+  }
+  const manager_data = [];
+  for (manager of manager_names) manager_data.push(employee_data.filter(e => e.first_name+' '+e.last_name === manager)[0]);
+  const manager_list = [];
+  for (manager of manager_data) manager_list.push(manager.first_name + ' ' + manager.last_name + ' ('+manager.department+')');
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Whose subordinates do you want to view?',
+      name: 'manager',
+      choices: manager_list
+    }
+  ]);
+  const subordinates = employee_data.filter(e => e.manager == manager_names[manager_list.indexOf(data.manager)]);
+  console.log(`\nSubordinates of ${texthelper.yellow(data.manager)}\n`);
+  console.table(subordinates);
   await prompt_main_menu();
 }
 
@@ -220,7 +250,7 @@ async function update_employee_role () {
   const data = await q.prompt([
     {
       type: 'list',
-      message: 'Which employee\'s role do you want to update?',
+      message: 'Which employee\'s role/manager do you want to update?',
       name: 'employee',
       choices: employee_names
     },
