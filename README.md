@@ -48,7 +48,7 @@ Follow the command line prompts to interact with the database, and select `Exit 
 
 ### Walkthrough
 
-🎥 A video walkthrough of the application can be viewed [here](https://drive.google.com/file/d/1BV0tyVEI-A_od4qukRjwkr7nVauJUn2D/view).
+🎥 A video walkthrough of the application can be viewed [here](https://drive.google.com/file/d/18G0SMTMYb7X6ztFVIw5YjsPOvMqTrjrq/view).
 
 ## Credits
 
