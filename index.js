@@ -39,7 +39,7 @@ async function prompt_main_menu () {
       message: 'What would you like to do?',
       choices: [texthelper.red('View All Employees'),
                 texthelper.red('Add Employee'),
-                texthelper.red('Update Employee Role'),
+                texthelper.red('Update Employee Role/Manager'),
                 texthelper.green('View All Roles'),
                 texthelper.green('Add Role'),
                 texthelper.cyan('View All Departments'),
@@ -54,6 +54,9 @@ async function prompt_main_menu () {
       break;
     case 'Add Employee':
       await add_employee();
+      break;
+    case 'Update Employee Role/Manager':
+      await update_employee_role();
       break;
     case 'View All Roles':
       display_roles();
@@ -195,12 +198,50 @@ async function add_employee () {
   ]);
   const role_id = role_ids[role_titles.indexOf(data.role)];
   const manager_id = employee_ids[employee_names.indexOf(data.manager)];
-  // console.log(data.role);
-  // console.log(role_titles);
-  // console.log(data.manager);
-  // console.log(data.first,' ',role_id,' ',manager_id);
   await db.addEmployee(data.first,data.last,role_id,manager_id);
   console.log(texthelper.yellow(`Added new employee ${data.first} ${data.last} to the database.`));
+  await prompt_main_menu();
+}
+
+/*------------------------------
+"UPDATE" Functions
+------------------------------*/
+
+async function update_employee_role () {
+  const role_data = await db.getRoles();
+  const role_titles = role_data.map(e => e.title);
+  const role_ids = role_data.map(e => e.id);
+  const employee_data = await db.getEmployees();
+  const employee_names = employee_data.map(e => e.first_name+' '+e.last_name);
+  const employee_ids = employee_data.map(e => e.id);
+  const employee_manager_names = ['None',...employee_names];
+  const employee_manager_ids = [null,...employee_ids];
+
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Which employee\'s role do you want to update?',
+      name: 'employee',
+      choices: employee_names
+    },
+    {
+      type: 'list',
+      message: 'Which role do you want to assign to the selected employee?',
+      name: 'role',
+      choices: role_titles
+    },
+    {
+      type: 'list',
+      message: 'Who is the employee\'s new manager?',
+      name: 'manager',
+      choices: employee_manager_names
+    }
+  ]);
+  const employee_id = employee_ids[employee_names.indexOf(data.employee)];
+  const role_id = role_ids[role_titles.indexOf(data.role)];
+  const manager_id = employee_manager_ids[employee_manager_names.indexOf(data.manager)];
+  await db.updateEmployeeRole(employee_id,role_id,manager_id);
+  console.log(texthelper.yellow(`Updated ${data.employee} with the role of ${data.role} in the database.`));
   await prompt_main_menu();
 }
 

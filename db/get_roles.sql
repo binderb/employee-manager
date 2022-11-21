@@ -4,4 +4,4 @@ SELECT r.id,
        CONCAT ('$',FORMAT(r.salary,'en_US')) AS salary 
 FROM role r LEFT JOIN department d 
 ON r.department_id = d.id
-ORDER BY d.name, r.salary DESC
+ORDER BY d.id, r.salary DESC

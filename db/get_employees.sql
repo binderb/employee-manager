@@ -12,4 +12,4 @@ LEFT JOIN department d
 ON r.department_id = d.id
 LEFT JOIN employee m
 ON e.manager_id = m.id
-ORDER BY d.name, r.salary DESC, e.last_name, e.first_name
+ORDER BY d.id, r.salary DESC, e.last_name, e.first_name
