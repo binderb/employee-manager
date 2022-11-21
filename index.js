@@ -47,6 +47,7 @@ async function prompt_main_menu () {
                 texthelper.green('Add Role'),
                 texthelper.green('Delete Role'),
                 texthelper.cyan('View All Departments'),
+                texthelper.cyan('View Departmental Budget'),
                 texthelper.cyan('Add Department'),
                 texthelper.cyan('Delete Department'),
                 texthelper.black('Exit Program')],
@@ -83,6 +84,9 @@ async function prompt_main_menu () {
       break;
     case 'View All Departments':
       display_depts();
+      break;
+    case 'View Departmental Budget':
+      await display_dept_budget();
       break;
     case 'Add Department':
       await add_dept();
@@ -174,6 +178,23 @@ async function display_by_dept () {
   const members = employee_data.filter(e => e.department == data.dept);
   console.log(`\nMembers of the ${texthelper.yellow(data.dept)} department:\n`);
   console.table(members);
+  await prompt_main_menu();
+}
+
+async function display_dept_budget () {
+  const dept_data = await db.getDepts();
+  const dept_names = dept_data.map(e => e.name);
+  const dept_ids = dept_data.map(e => e.id);
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Which departmental budget do you want to view?',
+      name: 'dept',
+      choices: dept_names
+    }
+  ]);
+  const budget = await db.getDeptBudget(dept_ids[dept_names.indexOf(data.dept)]);
+  console.table('\n',budget);
   await prompt_main_menu();
 }
 
