@@ -38,13 +38,17 @@ async function prompt_main_menu () {
       type: 'list',
       message: 'What would you like to do?',
       choices: [texthelper.red('View All Employees'),
+                texthelper.red('View Employees by Department'),
                 texthelper.red('View Employees by Manager'),
                 texthelper.red('Add Employee'),
                 texthelper.red('Update Employee Role/Manager'),
+                texthelper.red('Delete Employee'),
                 texthelper.green('View All Roles'),
                 texthelper.green('Add Role'),
+                texthelper.green('Delete Role'),
                 texthelper.cyan('View All Departments'),
                 texthelper.cyan('Add Department'),
+                texthelper.cyan('Delete Department'),
                 texthelper.black('Exit Program')],
       name: 'role'
     },
@@ -52,6 +56,9 @@ async function prompt_main_menu () {
   switch(texthelper.decode(data.role)) {
     case 'View All Employees':
       display_employees();
+      break;
+    case 'View Employees by Department':
+      display_by_dept();
       break;
     case 'View Employees by Manager':
       display_by_manager();
@@ -62,17 +69,26 @@ async function prompt_main_menu () {
     case 'Update Employee Role/Manager':
       await update_employee_role();
       break;
+    case 'Delete Employee':
+      await delete_employee();
+      break;
     case 'View All Roles':
       display_roles();
       break;
     case 'Add Role':
       await add_role();
       break;
+    case 'Delete Role':
+      await delete_role();
+      break;
     case 'View All Departments':
       display_depts();
       break;
     case 'Add Department':
       await add_dept();
+      break;
+    case 'Delete Department':
+      await delete_dept();
       break;
     default:
       await prompt_exit();
@@ -118,7 +134,6 @@ async function display_depts () {
 }
 
 async function display_by_manager () {
-  console.log('displaying by manager');
   const employee_data = await db.getEmployees();
   const manager_names = [];
 
@@ -138,8 +153,27 @@ async function display_by_manager () {
     }
   ]);
   const subordinates = employee_data.filter(e => e.manager == manager_names[manager_list.indexOf(data.manager)]);
-  console.log(`\nSubordinates of ${texthelper.yellow(data.manager)}\n`);
+  console.log(`\nSubordinates of ${texthelper.yellow(data.manager)}:\n`);
   console.table(subordinates);
+  await prompt_main_menu();
+}
+
+async function display_by_dept () {
+  const employee_data = await db.getEmployees();
+  const dept_data = await db.getDepts();
+  const dept_names = dept_data.map(e => e.name);
+
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Which department do you want to view?',
+      name: 'dept',
+      choices: dept_names
+    }
+  ]);
+  const members = employee_data.filter(e => e.department == data.dept);
+  console.log(`\nMembers of the ${texthelper.yellow(data.dept)} department:\n`);
+  console.table(members);
   await prompt_main_menu();
 }
 
@@ -229,7 +263,7 @@ async function add_employee () {
   const role_id = role_ids[role_titles.indexOf(data.role)];
   const manager_id = employee_ids[employee_names.indexOf(data.manager)];
   await db.addEmployee(data.first,data.last,role_id,manager_id);
-  console.log(texthelper.yellow(`Added new employee ${data.first} ${data.last} to the database.`));
+  console.log(`Added new employee ${texthelper.yellow(data.first)} ${texthelper.yellow(data.last)} to the database.`);
   await prompt_main_menu();
 }
 
@@ -271,7 +305,68 @@ async function update_employee_role () {
   const role_id = role_ids[role_titles.indexOf(data.role)];
   const manager_id = employee_manager_ids[employee_manager_names.indexOf(data.manager)];
   await db.updateEmployeeRole(employee_id,role_id,manager_id);
-  console.log(texthelper.yellow(`Updated ${data.employee} with the role of ${data.role} in the database.`));
+  console.log(`Updated ${texthelper.yellow(data.employee)} with the role of ${texthelper.yellow(data.role)} in the database.`);
+  await prompt_main_menu();
+}
+
+/*------------------------------
+"DELETE" Functions
+------------------------------*/
+
+async function delete_dept () {
+  const dept_data = await db.getDepts();
+  const dept_names = dept_data.map(e => e.name);
+  const dept_ids = dept_data.map(e => e.id);
+
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Which department do you want to remove?',
+      name: 'dept',
+      choices: dept_names
+    }
+  ]);
+  const dept_id = dept_ids[dept_names.indexOf(data.dept)];
+  await db.deleteDept(dept_id);
+  console.log(`Removed department ${texthelper.yellow(data.dept)} from the database.`);
+  await prompt_main_menu();
+}
+
+async function delete_role () {
+  const role_data = await db.getRoles();
+  const role_titles = role_data.map(e => e.title);
+  const role_ids = role_data.map(e => e.id);
+
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Which role do you want to remove?',
+      name: 'role',
+      choices: role_titles
+    }
+  ]);
+  const role_id = role_ids[role_titles.indexOf(data.role)];
+  await db.deleteRole(role_id);
+  console.log(`Removed role ${texthelper.yellow(data.role)} from the database.`);
+  await prompt_main_menu();
+}
+
+async function delete_employee () {
+  const employee_data = await db.getEmployees();
+  const employee_names = employee_data.map(e => e.first_name+' '+e.last_name);
+  const employee_ids = employee_data.map(e => e.id);
+
+  const data = await q.prompt([
+    {
+      type: 'list',
+      message: 'Which employee do you want to remove?',
+      name: 'employee',
+      choices: employee_names
+    }
+  ]);
+  const employee_id = employee_ids[employee_names.indexOf(data.employee)];
+  await db.deleteEmployee(employee_id);
+  console.log(`Removed employee ${texthelper.yellow(data.employee)} from the database.`);
   await prompt_main_menu();
 }
 
