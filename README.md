@@ -26,7 +26,7 @@ Use of the tool requires **Node.js** and relies on the **Inquirer**, **MySQL 2**
 
 ### Database/Connection Setup
 
-In order for the tool to run properly, you must have a MySQL server installed and running locally, and your MySQL server must contain a database called `employee_db` with the structure specified in `db/schema.sql`. In order to set this up, enter your MySQL shell and run
+In order for the tool to run properly, you must have a MySQL server installed and running locally, and the server must provide access to a database called `employee_db` with the structure specified in `db/schema.sql`. In order to set this up, enter your MySQL shell and run
 
     source db/schema.sql
 
