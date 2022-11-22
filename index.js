@@ -25,7 +25,7 @@ async function init () {
   console.log('================================================\n\n',
               title_text,
               '\n\n================================================\n');
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 /*------------------------------
@@ -65,37 +65,37 @@ async function prompt_main_menu () {
       display_by_manager();
       break;
     case 'Add Employee':
-      await add_employee();
+      add_employee();
       break;
     case 'Update Employee Role/Manager':
-      await update_employee_role();
+      update_employee_role();
       break;
     case 'Delete Employee':
-      await delete_employee();
+      delete_employee();
       break;
     case 'View All Roles':
       display_roles();
       break;
     case 'Add Role':
-      await add_role();
+      add_role();
       break;
     case 'Delete Role':
-      await delete_role();
+      delete_role();
       break;
     case 'View All Departments':
       display_depts();
       break;
     case 'View Departmental Budget':
-      await display_dept_budget();
+      display_dept_budget();
       break;
     case 'Add Department':
-      await add_dept();
+      add_dept();
       break;
     case 'Delete Department':
-      await delete_dept();
+      delete_dept();
       break;
     default:
-      await prompt_exit();
+      prompt_exit();
   }
 }
 
@@ -111,7 +111,7 @@ async function prompt_exit() {
     console.log('Exiting program. Have a nice day!');
     db.end();
   } else {
-    await prompt_main_menu();
+    prompt_main_menu();
   }
 }
 
@@ -122,19 +122,19 @@ async function prompt_exit() {
 async function display_employees () {
   const employees = await db.getEmployees();
   console.table('\n',employees);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function display_roles () {
   const roles = await db.getRoles();
   console.table('\n',roles);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function display_depts () {
   const depts = await db.getDepts();
   console.table('\n',depts);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function display_by_manager () {
@@ -159,7 +159,7 @@ async function display_by_manager () {
   const subordinates = employee_data.filter(e => e.manager == manager_names[manager_list.indexOf(data.manager)]);
   console.log(`\nSubordinates of ${texthelper.yellow(data.manager)}:\n`);
   console.table(subordinates);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function display_by_dept () {
@@ -178,7 +178,7 @@ async function display_by_dept () {
   const members = employee_data.filter(e => e.department == data.dept);
   console.log(`\nMembers of the ${texthelper.yellow(data.dept)} department:\n`);
   console.table(members);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function display_dept_budget () {
@@ -195,7 +195,7 @@ async function display_dept_budget () {
   ]);
   const budget = await db.getDeptBudget(dept_ids[dept_names.indexOf(data.dept)]);
   console.table('\n',budget);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 /*------------------------------
@@ -213,7 +213,7 @@ async function add_dept () {
   ]);
   await db.addDept(data.dept_name);
   console.log(texthelper.yellow(`Added ${data.dept_name} department to the database.`));
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function add_role () {
@@ -244,7 +244,7 @@ async function add_role () {
   const dept_id = dept_ids[dept_names.indexOf(data.dept)];
   await db.addRole(data.role_name,data.salary,dept_id);
   console.log(texthelper.yellow(`Added ${data.role_name} role to the database.`));
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function add_employee () {
@@ -285,7 +285,7 @@ async function add_employee () {
   const manager_id = employee_ids[employee_names.indexOf(data.manager)];
   await db.addEmployee(data.first,data.last,role_id,manager_id);
   console.log(`Added new employee ${texthelper.yellow(data.first)} ${texthelper.yellow(data.last)} to the database.`);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 /*------------------------------
@@ -327,7 +327,7 @@ async function update_employee_role () {
   const manager_id = employee_manager_ids[employee_manager_names.indexOf(data.manager)];
   await db.updateEmployeeRole(employee_id,role_id,manager_id);
   console.log(`Updated ${texthelper.yellow(data.employee)} with the role of ${texthelper.yellow(data.role)} in the database.`);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 /*------------------------------
@@ -350,7 +350,7 @@ async function delete_dept () {
   const dept_id = dept_ids[dept_names.indexOf(data.dept)];
   await db.deleteDept(dept_id);
   console.log(`Removed department ${texthelper.yellow(data.dept)} from the database.`);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function delete_role () {
@@ -369,7 +369,7 @@ async function delete_role () {
   const role_id = role_ids[role_titles.indexOf(data.role)];
   await db.deleteRole(role_id);
   console.log(`Removed role ${texthelper.yellow(data.role)} from the database.`);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 async function delete_employee () {
@@ -388,7 +388,7 @@ async function delete_employee () {
   const employee_id = employee_ids[employee_names.indexOf(data.employee)];
   await db.deleteEmployee(employee_id);
   console.log(`Removed employee ${texthelper.yellow(data.employee)} from the database.`);
-  await prompt_main_menu();
+  prompt_main_menu();
 }
 
 /*------------------------------
